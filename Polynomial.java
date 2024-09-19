@@ -1,4 +1,5 @@
 public class Polynomial{
+    //Polynomial File
     private double [] coefficients;
 
     public Polynomial(){
