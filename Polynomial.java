@@ -2,6 +2,7 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.FileNotFoundException; 
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.Scanner;
 
 public class Polynomial{
@@ -30,7 +31,7 @@ public class Polynomial{
     }
 
     private void ParsePolyFile(String poly){
-        String [] terms = poly.split("[\\+-]");
+        String [] terms = poly.split("(?=[+-])");
         this.coefficients = new double[terms.length];
         this.exponents = new int[terms.length];
 
@@ -47,7 +48,7 @@ public class Polynomial{
     }
 
     public Polynomial add(Polynomial poly){
-        int length = Math.max(this.coefficients.length, poly.coefficients.length);
+        int length = this.coefficients.length+poly.coefficients.length;
         double[] resultCoeff = new double[length];
         int [] resultExp = new int[length];
         int i = 0, j = 0, k = 0;
@@ -70,7 +71,6 @@ public class Polynomial{
             }
             k++;
         }
-
         while(i < this.coefficients.length){
             resultCoeff[k] = this.coefficients[i];
             resultExp[k] = this.exponents[i];
@@ -78,12 +78,19 @@ public class Polynomial{
             k++;
         }
         while(j < poly.coefficients.length){
-            resultCoeff[k] = this.coefficients[j];
-            resultExp[k] = this.exponents[j];
+            resultCoeff[k] = poly.coefficients[j];
+            resultExp[k] = poly.exponents[j];
             j++;
             k++;
         }
-        return new Polynomial(resultCoeff, resultExp);
+
+        double [] finalCoeff = new double[k];
+        int [] finalExp = new int[k];
+        for(i = 0; i < k; i++){
+            finalCoeff[i] = resultCoeff[i];
+            finalExp[i] = resultExp[i];
+        }
+        return new Polynomial(finalCoeff, finalExp);
     }
 
     public Polynomial multiply(Polynomial poly){
@@ -97,8 +104,9 @@ public class Polynomial{
                 int exp = this.exponents[i] + poly.exponents[j];
 
                 int index = findExponent(resultExp, exp);
+
                 if(index != -1){
-                    resultExp[index] += coeff;
+                    resultCoeff[index] += coeff;
                 }
                 else{
                     resultCoeff[k] = coeff;
@@ -136,13 +144,13 @@ public class Polynomial{
         return evaluate(x) == 0;
     };
 
-    public void SaveToFile(String filename) throws IOException{
-        try(FileWriter fw = new FileWriter(filename)){
+    public void saveToFile(String filename) throws IOException{
+        try(FileWriter fw = new FileWriter("labs/b07lab1/"+filename)){
             for(int i = 0; i < this.coefficients.length; i++){
-                if(i != 0){
+                if(i != 0 && this.coefficients[i] > 0){
                     fw.write("+");
                 }
-                fw.write(String.valueOf(this.coefficients[i]));
+                fw.write(String.valueOf((this.coefficients[i])));
                 if(this.exponents[i] != 0){
                     fw.write("x"+this.exponents[i]);
                 }
