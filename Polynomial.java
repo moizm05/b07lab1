@@ -1,7 +1,8 @@
 import java.io.File;
 import java.io.FileWriter;
-import java.io.IOException;
+import java.io.FileNotFoundException; 
 import java.util.Scanner;
+
 public class Polynomial{
     //Polynomial File
     private double [] coefficients;
@@ -14,6 +15,34 @@ public class Polynomial{
     public Polynomial(double[] coefficients, int[] exponents){
         this.coefficients = coefficients;
         this.exponents = exponents;
+    }
+
+    public Polynomial(File f){
+        try {
+            try(Scanner sc = new Scanner(f)){
+                String poly = sc.nextLine();
+                ParsePolyFile(poly);
+            }
+        } catch (FileNotFoundException e) {
+            System.err.println("Error occured");
+        }
+    }
+
+    private void ParsePolyFile(String poly){
+        String [] terms = poly.split("[\\+-]");
+        this.coefficients = new double[terms.length];
+        this.exponents = new int[terms.length];
+
+        for(int i = 0; i < terms.length; i++){
+            if(!terms[i].contains("x")){
+                this.coefficients[i] = Double.parseDouble(terms[i]);
+                this.exponents[i] = 0;
+            }else{
+                String [] term = terms[i].split("x");
+                this.coefficients[i] = Double.parseDouble(term[0]);
+                this.exponents[i] = Integer.parseInt(term[1]);
+            }
+        }
     }
 
     public Polynomial add(Polynomial poly){
